@@ -21,6 +21,7 @@
     "@types/uuid": "^3.4.4",
     "bcryptjs": "^2.4.3",
     "graphql-import": "^0.7.1",
+    "graphql-request": "^1.8.2",
     "graphql-yoga": "^1.17.4",
     "jest": "^24.5.0",
     "pg": "^7.9.0",
@@ -30,7 +31,7 @@
   },
   "scripts": {
     "start": "nodemon --exec ts-node --files src/index.ts",
-    "test": "jest",
+    "test": "NODE_ENV=test jest",
     "gen-schema-types": "gql2ts src/schema.graphql -o src/types/schema.d.ts"
   }
 }
