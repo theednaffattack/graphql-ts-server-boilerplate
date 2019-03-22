@@ -1,21 +1,30 @@
 import "reflect-metadata";
-import {createConnection} from "typeorm";
-import {User} from "./entity/User";
+import internalIp from "internal-ip";
+import chalk from "chalk";
+// import {createConnection} from "typeorm";
+import { GraphQLServer } from "graphql-yoga";
 
-createConnection().then(async connection => {
+const typeDefs = `
+  type Query {
+    hello(name: String): String!
+  }
+`;
 
-    console.log("Inserting a new user into the database...");
-    const user = new User();
-    user.firstName = "Timber";
-    user.lastName = "Saw";
-    user.age = 25;
-    await connection.manager.save(user);
-    console.log("Saved a new user with id: " + user.id);
+const resolvers = {
+  Query: {
+    hello: (_: any, { name }: any) => `Goodbye ${name || "World"}`
+  }
+};
 
-    console.log("Loading users from the database...");
-    const users = await connection.manager.find(User);
-    console.log("Loaded users: ", users);
+const port = process.env.PORT || 4000;
 
-    console.log("Here you can setup and run express/koa/any other framework.");
-
-}).catch(error => console.log(error));
+const server = new GraphQLServer({ typeDefs, resolvers });
+server.start(() =>
+  console.log(`
+Graphql server is running!
+${chalk.green("localhost")}: http://localhost:${chalk.green(port.toString())}
+${chalk.green("LAN")}: http://${internalIp.v4.sync()}:${chalk.green(
+    port.toString()
+  )}
+`)
+);
