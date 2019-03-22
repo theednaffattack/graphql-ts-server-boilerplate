@@ -1,12 +1,15 @@
 import { request } from "graphql-request";
+import { createConnection } from "typeorm";
+import { User } from "../entity/User";
 //   module.exports = sum;
 
 //   const sum = require('./sum');
-const email = "bill@bill.com";
+const email = "eunice@bill.com";
 const password = "whoopie";
 
 // import { port } from "../index";
 const port = 4000;
+const host = `http://192.168.1.40:${port}`;
 
 const mutation = `
 mutation {
@@ -14,28 +17,21 @@ mutation {
 }
 `;
 
-test("Register user", async () => {
-  const response = await request(`http://192.168.1.40:${port}`, mutation);
-  console.log(response);
+test("Register user", async done => {
+  const response = await request(host, mutation);
   expect(response).toEqual({
     register: true
   });
-});
 
-// test("adds 1 + 2 to equal 3", () => {
-//   expect(sum(1, 2)).toBe(3);
-// });
-
-// simple arithmatic
-test("two plus two is four", () => {
-  expect(2 + 2).toBe(4);
-});
-
-test("object assignment", () => {
-  interface DataObject {
-    [key: string]: number;
-  }
-  const data: DataObject = { one: 1 };
-  data["two"] = 2;
-  expect(data).toEqual({ one: 1, two: 2 });
+  createConnection()
+    .then(async connection => {
+      const users = await User.find({ where: { email } });
+      const user = users[0];
+      expect(user.email).toEqual(email);
+      expect(user.password).not.toEqual(password);
+      connection.close();
+      done();
+    })
+    .catch(e => console.error(e));
+  // expect(users).toHaveLength(1);
 });

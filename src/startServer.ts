@@ -20,7 +20,6 @@ export const host = internalIp.v4.sync();
 
 export const startServer = async () => {
   await createConnection();
-  // await server.start();
 
   const app = await server.start();
   // {
