@@ -5,6 +5,8 @@
   "devDependencies": {
     "@types/node": "^11.11.4",
     "chalk": "^2.4.2",
+    "gql2ts": "^1.10.1",
+    "graphql-tools": "^4.0.4",
     "internal-ip": "^4.2.0",
     "nodemon": "^1.18.10",
     "ts-node": "8.0.3",
@@ -13,7 +15,10 @@
     "typescript": "3.3.4000"
   },
   "dependencies": {
+    "@types/bcryptjs": "^2.4.2",
     "@types/uuid": "^3.4.4",
+    "bcryptjs": "^2.4.3",
+    "graphql-import": "^0.7.1",
     "graphql-yoga": "^1.17.4",
     "pg": "^7.9.0",
     "reflect-metadata": "^0.1.13",
@@ -21,6 +26,7 @@
     "uuid": "^3.3.2"
   },
   "scripts": {
-    "start": "nodemon --exec ts-node src/index.ts"
+    "start": "nodemon --exec ts-node --files src/index.ts",
+    "gen-schema-types": "gql2ts src/schema.graphql -o src/types/schema.d.ts"
   }
 }

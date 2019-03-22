@@ -1,30 +1,28 @@
 import "reflect-metadata";
 import internalIp from "internal-ip";
 import chalk from "chalk";
-// import {createConnection} from "typeorm";
+import { createConnection } from "typeorm";
 import { GraphQLServer } from "graphql-yoga";
+import { importSchema } from "graphql-import";
+import * as path from "path";
+// import { makeExecutableSchema } from "graphql-tools";
 
-const typeDefs = `
-  type Query {
-    hello(name: String): String!
-  }
-`;
+const typeDefs = importSchema(path.join(__dirname, "./schema.graphql"));
 
-const resolvers = {
-  Query: {
-    hello: (_: any, { name }: any) => `Goodbye ${name || "World"}`
-  }
-};
+import { resolvers } from "./resolvers";
 
 const port = process.env.PORT || 4000;
 
 const server = new GraphQLServer({ typeDefs, resolvers });
-server.start(() =>
-  console.log(`
+
+createConnection().then(() => {
+  server.start(() =>
+    console.log(`
 Graphql server is running!
 ${chalk.green("localhost")}: http://localhost:${chalk.green(port.toString())}
 ${chalk.green("LAN")}: http://${internalIp.v4.sync()}:${chalk.green(
-    port.toString()
-  )}
+      port.toString()
+    )}
 `)
-);
+  );
+});
