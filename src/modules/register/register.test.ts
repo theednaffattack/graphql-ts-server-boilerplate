@@ -1,6 +1,5 @@
 import { request } from "graphql-request";
 import { User } from "../../entity/User";
-// import { createTypeOrmConn } from "../utils/createTypeormConnection";
 
 import { startServer } from "../../startServer";
 import { AddressInfo } from "net";
@@ -11,10 +10,6 @@ import {
   passwordNotLongEnough
 } from "./errorMessages";
 
-// let getHost: any = () => "";
-
-// let app;
-
 let getHost = () => "";
 
 let app: any;
@@ -24,10 +19,6 @@ beforeAll(async () => {
   const { port } = (await app.address()) as AddressInfo;
   getHost = () => `http://127.0.0.1:${port}`;
 });
-
-// afterAll(() => {
-//   app.close();
-// });
 
 const email = "eunice@bill.com";
 // const email = "eu";
@@ -52,13 +43,13 @@ interface Response {
   ];
 }
 
+// test user creation
 test("Register user", async done => {
   const response: Response = await request(
     getHost(),
     mutation(email, password)
   );
 
-  // test user creation
   expect(response).toEqual({ register: null });
 
   const users = await User.find({ where: { email } });
@@ -106,7 +97,6 @@ test("Register user", async done => {
 });
 
 // test for bad password
-
 test("Register user", async done => {
   const response4: Response = await request(getHost(), mutation(email, "fake"));
   expect(response4.register[0]).toEqual({
