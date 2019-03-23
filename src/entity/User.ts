@@ -5,6 +5,7 @@ import {
   Entity,
   PrimaryColumn
   // PrimaryGeneratedColumn
+  // PrimaryGeneratedColumn
 } from "typeorm";
 import * as uuidv4 from "uuid/v4";
 // uuidv4(); // ⇨ '10ba038e-48da-487b-96e8-8d3b99b6d18a'
