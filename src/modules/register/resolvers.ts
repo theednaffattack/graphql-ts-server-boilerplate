@@ -9,6 +9,7 @@ import {
   emailNotLongEnough,
   passwordNotLongEnough
 } from "./errorMessages";
+import { createConfirmedEmailLink } from "../../utils/createConfirmedEmailLink";
 
 const schema = yup.object().shape({
   email: yup
@@ -27,13 +28,18 @@ export const resolvers: ResolverMap = {
     dummy: (_, {}) => "just a string"
   },
   Mutation: {
-    register: async (_, args: GQL.IRegisterOnMutationArguments) => {
+    register: async (
+      _,
+      args: GQL.IRegisterOnMutationArguments,
+      { redis, url }
+    ) => {
       try {
         await schema.validate(args, { abortEarly: false });
       } catch (error) {
         return formatYupError(error);
       }
-      let { email, password } = args;
+
+      const { email, password } = args;
 
       const userAlreadyExists = await User.findOne({
         where: { email },
@@ -57,6 +63,9 @@ export const resolvers: ResolverMap = {
       });
 
       await user.save();
+
+      const link = await createConfirmedEmailLink(url, user.id, redis);
+
       return null;
     }
   }
