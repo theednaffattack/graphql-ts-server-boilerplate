@@ -1,37 +1,60 @@
 import { request } from "graphql-request";
-import { createConnection } from "typeorm";
 import { User } from "../entity/User";
-//   module.exports = sum;
+// import { createTypeOrmConn } from "../utils/createTypeormConnection";
 
-//   const sum = require('./sum');
+import { startServer } from "../startServer";
+import { AddressInfo } from "net";
+
+// let getHost: any = () => "";
+
+// let app;
+
+let getHost = () => "";
+
+let app: any;
+
+beforeAll(async () => {
+  app = await startServer();
+  const { port } = (await app.address()) as AddressInfo;
+  getHost = () => `http://127.0.0.1:${port}`;
+});
+
+afterAll(() => {
+  app.close();
+});
+
 const email = "eunice@bill.com";
 const password = "whoopie";
 
-// import { port } from "../index";
-const port = 4000;
-const host = `http://192.168.1.40:${port}`;
-
 const mutation = `
 mutation {
-  register(email: "${email}", password: "${password}")
+  register(email: "${email}", password: "${password}"){
+    email,
+    password
+  }
 }
 `;
 
 test("Register user", async done => {
-  const response = await request(host, mutation);
-  expect(response).toEqual({
-    register: true
-  });
+  interface Response {
+    register: {
+      email: string;
+      password: string;
+    };
+  }
+  // await createTypeOrmConn();
+  const response: Response = await request(getHost(), mutation);
 
-  createConnection()
-    .then(async connection => {
-      const users = await User.find({ where: { email } });
-      const user = users[0];
-      expect(user.email).toEqual(email);
-      expect(user.password).not.toEqual(password);
-      connection.close();
-      done();
-    })
-    .catch(e => console.error(e));
-  // expect(users).toHaveLength(1);
+  console.log("RESPONSE!!!");
+  console.log(response);
+  expect(response.register.email).toEqual(email);
+  expect(response.register.password).not.toEqual(password);
+  const users = await User.find({ where: { email } });
+  const user = users[0];
+  console.log("USERS!!!");
+  console.log(users);
+  expect(user.email).toEqual(email);
+  expect(user.password).not.toEqual(password);
+
+  done();
 });
