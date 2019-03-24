@@ -26,6 +26,7 @@
     "username": "eddie",
     "password": "eddie",
     "database": "local_test_testing",
+    "keepConnectionAlive": true,
     "synchronize": true,
     "logging": false,
     "dropSchema": true,

@@ -1,23 +1,22 @@
 import { request } from "graphql-request";
 import { User } from "../../entity/User";
 
-import { startServer } from "../../startServer";
-import { AddressInfo } from "net";
+// import { startServer } from "../../startServer";
+// import { AddressInfo } from "net";
 import {
   emailNotLongEnough,
   duplicateEmail,
   emailInvalid,
   passwordNotLongEnough
 } from "./errorMessages";
+import { createTypeOrmConn } from "../../utils/createTypeormConnection";
 
-let getHost = () => "";
+// let getHost = () => "";
 
-let app: any;
+// let app: any;
 
 beforeAll(async () => {
-  app = await startServer();
-  const { port } = (await app.address()) as AddressInfo;
-  getHost = () => `http://127.0.0.1:${port}`;
+  await createTypeOrmConn();
 });
 
 const email = "eunice@bill.com";
@@ -46,7 +45,7 @@ interface Response {
 describe("User registration testing", () => {
   it("Register user with properly formatted information", async done => {
     const response: Response = await request(
-      getHost(),
+      process.env.TEST_HOST as string,
       mutation(email, password)
     );
 
@@ -62,7 +61,7 @@ describe("User registration testing", () => {
 
   it("Test for duplicate emails", async done => {
     const response2: Response = await request(
-      getHost(),
+      process.env.TEST_HOST as string,
       mutation(email, password)
     );
 
@@ -77,7 +76,7 @@ describe("User registration testing", () => {
 
   it("Test for emails that are too short", async done => {
     const response3: Response = await request(
-      getHost(),
+      process.env.TEST_HOST as string,
       mutation("b", password)
     );
 
@@ -99,7 +98,7 @@ describe("User registration testing", () => {
 
   it("Test for passwords that are too short", async done => {
     const response4: Response = await request(
-      getHost(),
+      process.env.TEST_HOST as string,
       mutation(email, "fake")
     );
     expect(response4.register[0]).toEqual({
@@ -112,7 +111,7 @@ describe("User registration testing", () => {
 
   it("Catch bad password and bad email (too short and mal formatted)", async done => {
     const response5: Response = await request(
-      getHost(),
+      process.env.TEST_HOST as string,
       mutation("bu", "fake")
     );
     expect(response5).toEqual({

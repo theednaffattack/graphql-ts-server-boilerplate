@@ -56,6 +56,7 @@ export const startServer = async () => {
       const myId: string = userId === null ? "nope" : userId.toString();
 
       await User.update({ id: myId.toString() }, { confirmed: true });
+      await redis.del(id);
       res.send("ok");
     } else {
       res.send("invalid");
