@@ -7,6 +7,7 @@
     "username": "eddie",
     "password": "eddie",
     "database": "local_test",
+    "keepConnectionAlive": true,
     "synchronize": true,
     "logging": true,
     "entities": ["src/entity/**/*.ts"],

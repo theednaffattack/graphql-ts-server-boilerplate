@@ -10,3 +10,21 @@ export interface ResolverMap {
     ) => any;
   };
 }
+
+export interface Response {
+  register: [
+    {
+      path: string;
+      message: string;
+    }
+  ];
+}
+
+export interface LoginResponse {
+  login: [
+    {
+      path: string;
+      message: string;
+    }
+  ];
+}

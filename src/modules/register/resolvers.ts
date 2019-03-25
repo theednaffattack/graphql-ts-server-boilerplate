@@ -9,7 +9,8 @@ import {
   emailNotLongEnough,
   passwordNotLongEnough
 } from "./errorMessages";
-import { createConfirmedEmailLink } from "../../utils/createConfirmedEmailLink";
+// import { createConfirmedEmailLink } from "../../utils/createConfirmedEmailLink";
+// import { sendEmail } from "../../sendEmail";
 
 const schema = yup.object().shape({
   email: yup
@@ -30,8 +31,8 @@ export const resolvers: ResolverMap = {
   Mutation: {
     register: async (
       _,
-      args: GQL.IRegisterOnMutationArguments,
-      { redis, url }
+      args: GQL.IRegisterOnMutationArguments
+      // { redis, url }
     ) => {
       try {
         await schema.validate(args, { abortEarly: false });
@@ -64,7 +65,20 @@ export const resolvers: ResolverMap = {
 
       await user.save();
 
-      await createConfirmedEmailLink(url, user.id, redis);
+      // console.log("process.env.SPARKPOST_API_KEY");
+      // console.log(process.env.SPARKPOST_API_KEY);
+
+      // await sendEmail(
+      //   email,
+      //   await createConfirmedEmailLink(url, user.id, redis)
+      // );
+
+      // [
+      //   {
+      //     path: "email",
+      //     message: await createConfirmedEmailLink(url, user.id, redis)
+      //   }
+      // ];
 
       return null;
     }

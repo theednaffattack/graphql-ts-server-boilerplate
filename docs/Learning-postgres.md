@@ -1,9 +1,16 @@
-
-
-
-
 ## psql commands
 
-\du		show all users
+\du show all users
 
-\q		exit
+\q exit
+
+\dx show installed extensions
+
+\df describe functions
+
+LOGIN COMMANDS
+
+psql -d mydb -U myuser
+psql -h myhost -d mydb -U myuser
+
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";

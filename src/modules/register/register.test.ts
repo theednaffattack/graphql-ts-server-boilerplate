@@ -11,10 +11,6 @@ import {
 } from "./errorMessages";
 import { createTypeOrmConn } from "../../utils/createTypeormConnection";
 
-// let getHost = () => "";
-
-// let app: any;
-
 beforeAll(async () => {
   await createTypeOrmConn();
 });
@@ -24,7 +20,7 @@ const email = "eunice@bill.com";
 const password = "whoopiebl";
 // const password = "wh";
 
-const mutation = (e: string, p: string) => `
+export const registerMutation = (e: string, p: string) => `
 mutation {
   register(email: "${e}", password: "${p}"){
     path,
@@ -46,7 +42,7 @@ describe("User registration testing", () => {
   it("Register user with properly formatted information", async done => {
     const response: Response = await request(
       process.env.TEST_HOST as string,
-      mutation(email, password)
+      registerMutation(email, password)
     );
 
     expect(response).toEqual({ register: null });
@@ -62,7 +58,7 @@ describe("User registration testing", () => {
   it("Test for duplicate emails", async done => {
     const response2: Response = await request(
       process.env.TEST_HOST as string,
-      mutation(email, password)
+      registerMutation(email, password)
     );
 
     expect(response2.register).toHaveLength(1);
@@ -77,7 +73,7 @@ describe("User registration testing", () => {
   it("Test for emails that are too short", async done => {
     const response3: Response = await request(
       process.env.TEST_HOST as string,
-      mutation("b", password)
+      registerMutation("b", password)
     );
 
     expect(response3).toEqual({
@@ -99,7 +95,7 @@ describe("User registration testing", () => {
   it("Test for passwords that are too short", async done => {
     const response4: Response = await request(
       process.env.TEST_HOST as string,
-      mutation(email, "fake")
+      registerMutation(email, "fake")
     );
     expect(response4.register[0]).toEqual({
       path: "password",
@@ -112,7 +108,7 @@ describe("User registration testing", () => {
   it("Catch bad password and bad email (too short and mal formatted)", async done => {
     const response5: Response = await request(
       process.env.TEST_HOST as string,
-      mutation("bu", "fake")
+      registerMutation("bu", "fake")
     );
     expect(response5).toEqual({
       register: [

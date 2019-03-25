@@ -1,17 +1,7 @@
-import {
-  BaseEntity,
-  BeforeInsert,
-  Column,
-  Entity,
-  PrimaryColumn
-  // PrimaryGeneratedColumn
-  // PrimaryGeneratedColumn
-} from "typeorm";
-import * as uuidv4 from "uuid/v4";
-// uuidv4(); // ⇨ '10ba038e-48da-487b-96e8-8d3b99b6d18a'
+import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 @Entity("users")
 export class User extends BaseEntity {
-  @PrimaryColumn("uuid")
+  @PrimaryGeneratedColumn("uuid")
   id: string;
 
   @Column("varchar", { length: 255 })
@@ -22,9 +12,4 @@ export class User extends BaseEntity {
 
   @Column("boolean", { default: false })
   confirmed: boolean;
-
-  @BeforeInsert()
-  addId() {
-    this.id = uuidv4();
-  }
 }
