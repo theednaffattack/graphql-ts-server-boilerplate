@@ -1,6 +1,8 @@
 export const invalidLogin = "invalid login";
 
-export const confirmEmailError = "please confirm your email";
+export const confirmEmailError = [
+  { path: "email", message: "please confirm your email" }
+];
 
 export const errorResponse = [
   {
@@ -8,3 +10,12 @@ export const errorResponse = [
     message: invalidLogin
   }
 ];
+
+export const sessionError = (loginName: any) => {
+  return [
+    {
+      path: "login",
+      message: `Session Error: ${loginName} An error occurred setting "userId" to the SESSION object`
+    }
+  ];
+};

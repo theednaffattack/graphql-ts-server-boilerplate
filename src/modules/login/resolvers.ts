@@ -2,7 +2,11 @@ import * as bcrypt from "bcryptjs";
 
 import { ResolverMap } from "../../types/graphql-utils";
 import { User } from "../../entity/User";
-import { errorResponse, confirmEmailError } from "./errorMessages";
+import {
+  errorResponse,
+  confirmEmailError
+  // sessionError
+} from "./errorMessages";
 
 export const resolvers: ResolverMap = {
   Query: {
@@ -12,10 +16,9 @@ export const resolvers: ResolverMap = {
     login: async function loginMut(
       _,
       { email, password }: GQL.ILoginOnMutationArguments,
-      { session }
+      context
     ) {
       const user = await User.findOne({ where: { email } });
-
       if (!user) {
         return errorResponse;
       }
@@ -31,16 +34,25 @@ export const resolvers: ResolverMap = {
       }
 
       // login successful
-      if (session) {
-        session.userId = user.id;
-      } else {
-        throw Error(
-          `Resolver Error:${
-            this.login.name
-          } An error occurred setting "userId" to the SESSION object`
-        );
-      }
+      // if (session) {
+      console.log("VIEW SESSION during login mutation");
+      console.log("user.id " + user.id);
+      context.session.userId = user.id;
 
+      if (context.req.session) {
+        context.req.session.userId = user.id;
+
+        console.log(context.req.session.userId);
+        console.log(context.req.session);
+      } else {
+        throw Error("no session object!");
+      }
+      //   return [{ path: "login", message: "login successful" }];
+      // } else {
+      //   return sessionError(this.login.name);
+      // }
+
+      // return [{ path: "login", message: "error! should be unreachable" }];
       return null;
     }
   }

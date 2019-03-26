@@ -2,8 +2,6 @@ import axios from "axios";
 import { createTypeOrmConn } from "../../utils/createTypeormConnection";
 import { User } from "../../entity/User";
 
-import { loginMutation } from "../login/login.test";
-
 // const redis = new Redis();
 import { Connection } from "typeorm";
 
@@ -25,6 +23,7 @@ beforeAll(async () => {
       confirmed: true
     }).save();
 
+    console.log("VIEW user");
     console.log(user);
   } else {
     connection = await createTypeOrmConn();
@@ -34,6 +33,7 @@ beforeAll(async () => {
       confirmed: true
     }).save();
 
+    console.log("VIEW user");
     console.log(user);
   }
 });
@@ -44,15 +44,6 @@ afterAll(async () => {
   }
 });
 
-// export const loginMutatiogn = (e: string, p: string) => `
-// mutation {
-//   login(email: "${e}", password: "${p}"){
-//     path,
-//     message
-//   }
-// }
-// `;
-
 const meQuery = `
 {
     me {
@@ -62,13 +53,22 @@ const meQuery = `
 }
 `;
 
+const loginMutation = (e: string, p: string) => `
+mutation {
+  login(email: "${e}", password: "${p}"){
+    path,
+    message
+  }
+}
+`;
+
 describe("me", () => {
   //   test("can't get user if not logged in", async () => {
   //     // later
   //   });
 
-  test("get currrent user", async () => {
-    await axios.post(
+  test("get currrent user", async done => {
+    const loginThing = await axios.post(
       process.env.TEST_HOST as string,
       {
         query: loginMutation(email, password)
@@ -77,11 +77,23 @@ describe("me", () => {
         withCredentials: true
       }
     );
+
     const response = await axios.post(
       process.env.TEST_HOST as string,
       { query: meQuery },
       { withCredentials: true }
     );
-    console.log(response.data);
+
+    console.log("From test: response.data");
+    console.log("loginThing.headers");
+    console.log(loginThing.headers);
+    console.log("response.headers");
+    console.log(response.headers);
+    console.log(response.data.data);
+
+    console.log(Object.keys(response.headers));
+    console.log(Object.keys(loginThing.headers));
+    // console.log(Object.keys(response));
+    done();
   });
 });

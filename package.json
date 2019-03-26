@@ -56,7 +56,7 @@
   "scripts": {
     "start": "NODE_ENV=development nodemon -r dotenv/config  --exec ts-node --files src/index.ts",
     "test-server": "NODE_ENV=test ts-node -r dotenv/config --files src/index.ts",
-    "test": "NODE_ENV=test TS_NODE_FILES=true jest --watch --detectOpenHandles",
+    "test": "NODE_ENV=test TERM=dumb TS_NODE_FILES=true jest --watch --detectOpenHandles",
     "gen-schema-types": "ts-node -r dotenv/config --files src/scripts/createTypes.ts"
   }
 }

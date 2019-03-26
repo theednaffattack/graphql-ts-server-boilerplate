@@ -29,7 +29,8 @@ export const startServer = async () => {
     context: ({ request }) => ({
       redis,
       url: request.protocol + "://" + request.get("host"),
-      session: request.session
+      session: request.session,
+      req: request
     })
   });
 
@@ -50,9 +51,11 @@ export const startServer = async () => {
     })
   );
 
+  // let origin;
+
   const cors = {
     credentials: true,
-    origin: process.env.NODE_ENV === "test" ? "*" : process.env.FRONTEND_HOST
+    origin: process.env.FRONTEND_HOST
   };
 
   server.express.get("/confirm/:id", confirmEmail);
