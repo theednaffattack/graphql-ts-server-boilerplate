@@ -29,6 +29,12 @@ beforeAll(async () => {
   }
 });
 
+afterAll(async () => {
+  if (connection) {
+    connection.close();
+  }
+});
+
 test("Make sure createtConfirmationEmailLink confirms user and clears key in redis", async () => {
   const url = await createConfirmedEmailLink(
     process.env.TEST_HOST as string,

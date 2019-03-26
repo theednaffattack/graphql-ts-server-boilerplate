@@ -9,7 +9,11 @@ export const resolvers: ResolverMap = {
     dummy2: (_, {}) => "just a string"
   },
   Mutation: {
-    login: async (_, { email, password }: GQL.ILoginOnMutationArguments) => {
+    login: async function loginMut(
+      _,
+      { email, password }: GQL.ILoginOnMutationArguments,
+      { session }
+    ) {
       const user = await User.findOne({ where: { email } });
 
       if (!user) {
@@ -24,6 +28,17 @@ export const resolvers: ResolverMap = {
 
       if (!valid) {
         return errorResponse;
+      }
+
+      // login successful
+      if (session) {
+        session.userId = user.id;
+      } else {
+        throw Error(
+          `Resolver Error:${
+            this.login.name
+          } An error occurred setting "userId" to the SESSION object`
+        );
       }
 
       return null;

@@ -10,7 +10,7 @@ const password = "123";
 const goodEmail = "eddienaff@gmail.com";
 const goodPassword = "booyakasha";
 
-const loginMutation = (e: string, p: string) => `
+export const loginMutation = (e: string, p: string) => `
 mutation {
   login(email: "${e}", password: "${p}"){
     path,
