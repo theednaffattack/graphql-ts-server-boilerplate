@@ -93,7 +93,6 @@ describe("me", () => {
 
     console.log(Object.keys(response.headers));
     console.log(Object.keys(loginThing.headers));
-    // console.log(Object.keys(response));
     done();
   });
 });
