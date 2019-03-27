@@ -14,6 +14,37 @@ const password = "kasdjfksafdj";
 // const goodEmail = "eddienaff@gmail.com";
 // const goodPassword = "booyakasha";
 
+export const loginAndQueryMeTest = async () => {
+  test("get currrent user", async done => {
+    const loginThing = await axios.post(
+      process.env.TEST_HOST as string,
+      {
+        query: loginMutation(email, password)
+      },
+      {
+        withCredentials: true
+      }
+    );
+
+    const response = await axios.post(
+      process.env.TEST_HOST as string,
+      { query: meQuery },
+      { withCredentials: true }
+    );
+
+    console.log("From test: response.data");
+    console.log("loginThing.headers");
+    console.log(loginThing.headers);
+    console.log("response.headers");
+    console.log(response.headers);
+    console.log(response.data.data);
+
+    console.log(Object.keys(response.headers));
+    console.log(Object.keys(loginThing.headers));
+    done();
+  });
+};
+
 beforeAll(async () => {
   if (connection) {
     console.log("CONNECTED ALREADY!");
@@ -68,6 +99,32 @@ describe("me", () => {
   //   });
 
   test("get currrent user", async done => {
+    const loginThing2 = await axios.post(
+      process.env.TEST_HOST as string,
+      {
+        query: loginMutation(email, password)
+      },
+      {
+        withCredentials: true
+      }
+    );
+
+    const response2 = await axios.post(
+      process.env.TEST_HOST as string,
+      { query: meQuery },
+      { withCredentials: true }
+    );
+
+    console.log("From test: response.data");
+    console.log("loginThing.headers");
+    console.log(loginThing2.headers);
+    console.log("response.headers");
+    console.log(response2.headers);
+    console.log(response2.data.data);
+
+    console.log(Object.keys(response2.headers));
+    console.log(Object.keys(loginThing2.headers));
+    // done();
     const loginThing = await axios.post(
       process.env.TEST_HOST as string,
       {
@@ -96,3 +153,16 @@ describe("me", () => {
     done();
   });
 });
+
+export const testNoCookie = () => {
+  describe("more me?", () => {
+    test("return null if no cookie", async () => {
+      const response = await axios.post(
+        process.env.TEST_HOST as string,
+        { query: meQuery },
+        { withCredentials: true }
+      );
+      expect(response.data.data.data.me).toBeNull();
+    });
+  });
+};
