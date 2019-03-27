@@ -1,22 +1,13 @@
-import axios from "axios";
+import { Connection } from "typeorm";
+
 import { createTypeOrmConn } from "../../utils/createTypeormConnection";
 import { User } from "../../entity/User";
-
-// const redis = new Redis();
-import { Connection } from "typeorm";
-// import { loginAndQueryMeTest } from "../me/me.test";
-
-// let userId: any;
+import { TestClient } from "../../utils/testClient";
 
 let connection: Connection;
-const email = "LOGOUTTEST@mac.com";
+
+const email = "esad@mac.com";
 const password = "kasdjfksafdj";
-
-const loginEmail = "esad@mac.com";
-const loginPassword = "kasdjfksafdj";
-
-// const goodEmail = "eddienaff@gmail.com";
-// const goodPassword = "booyakasha";
 
 beforeAll(async () => {
   if (connection) {
@@ -48,67 +39,25 @@ afterAll(async () => {
   }
 });
 
-const meQuery = `
-{
-    me {
-        id
-        email
-    }
-}
-`;
+describe("logout", () => {
+  test("test LOGGING IN and then LOGGING OUT a user", async () => {
+    const client = new TestClient(process.env.TEST_HOST as string);
 
-const loginMutation = (e: string, p: string) => `
-mutation {
-  login(email: "${e}", password: "${p}"){
-    path,
-    message
-  }
-}
-`;
+    await client.login(email, password);
 
-const logoutMutation = `
-mutation {
-  logout
-}
-`;
+    const response1 = await client.me();
 
-describe("logout", async () => {
-  test("test logout a user", async () => {
-    await axios.post(
-      process.env.TEST_HOST as string,
-      {
-        query: loginMutation(loginEmail, loginPassword)
-      },
-      {
-        withCredentials: true
-      }
-    );
-
-    const response = await axios.post(
-      process.env.TEST_HOST as string,
-      { query: meQuery },
-      { withCredentials: true }
-    );
-    expect(response.data.data.me).toEqual({
+    expect(response1.data).toEqual({
       me: {
-        id: "2531c33a-5d69-4f99-91a7-ee1653b49155",
+        id: "cecec352-b002-4e62-bfb1-16acc5789592",
         email: "esad@mac.com"
       }
     });
 
-    // later
-    await axios.post(
-      process.env.TEST_HOST as string,
-      { query: logoutMutation },
-      { withCredentials: true }
-    );
+    await client.logout();
 
-    const responseToo = await axios.post(
-      process.env.TEST_HOST as string,
-      { query: meQuery },
-      { withCredentials: true }
-    );
+    const responseToo = await client.me();
 
-    expect(responseToo.data.data.me).toBeNull();
+    expect(responseToo.data.me).toBeNull();
   });
 });
