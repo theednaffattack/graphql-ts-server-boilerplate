@@ -13,6 +13,7 @@ import { createTypeOrmConn } from "./utils/createTypeormConnection";
 // imported functions
 import { confirmEmail } from "./routes/confirmEmail";
 import { genSchema } from "./utils/generateSchema";
+import { redisSessionPrefix } from "./constants";
 // import { RedisClient } from "redis";
 
 const RedisStore = connectRedis(session);
@@ -40,7 +41,8 @@ export const startServer = async () => {
       name: "qid",
       secret: SECRET,
       store: new RedisStore({
-        client: redis as any
+        client: redis as any,
+        prefix: redisSessionPrefix
       }),
       resave: false,
       saveUninitialized: false,

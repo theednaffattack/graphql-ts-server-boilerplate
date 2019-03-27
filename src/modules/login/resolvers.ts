@@ -7,6 +7,8 @@ import {
   confirmEmailError
   // sessionError
 } from "./errorMessages";
+import { userSessionIdPrefix } from "../../constants";
+// import { redisSessionPrefix } from "../../constants";
 
 export const resolvers: ResolverMap = {
   Query: {
@@ -16,38 +18,35 @@ export const resolvers: ResolverMap = {
     login: async function loginMut(
       _,
       { email, password }: GQL.ILoginOnMutationArguments,
-      context
+      { redis, req, session }
     ) {
       const user = await User.findOne({ where: { email } });
+      // can't find user
       if (!user) {
         return errorResponse;
       }
 
+      // user is found but has not confirmed their account yet
       if (!user.confirmed) {
         return confirmEmailError;
       }
 
+      // compare the supplied password to the db password for this user
       const valid = await bcrypt.compare(password, user.password);
 
+      // password is incorrect (does not match db record)
       if (!valid) {
         return errorResponse;
       }
 
       // login successful
-      // if (session) {
-      context.session.userId = user.id;
+      session.userId = user.id;
+      if (req.sessionID) {
+        await redis.lpush(`${userSessionIdPrefix}${user.id}`, req.sessionID); // creates an array and adds one element or adds to existing
 
-      if (context.req.session) {
-        context.req.session.userId = user.id;
-      } else {
-        throw Error("no session object!");
+        return [{ path: "login", message: "login successful" }];
       }
-      //   return [{ path: "login", message: "login successful" }];
-      // } else {
-      //   return sessionError(this.login.name);
-      // }
 
-      // return [{ path: "login", message: "error! should be unreachable" }];
       return null;
     }
   }

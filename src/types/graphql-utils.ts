@@ -4,7 +4,7 @@ import { Request } from "express";
 export type Resolver = (
   parent: any,
   args: any,
-  context: { redis: Redis; url: string; session: Session; req: Reqwuest },
+  context: { redis: Redis; url: string; session: Session; req: Request },
   info: any
 ) => any;
 
