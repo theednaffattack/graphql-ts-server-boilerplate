@@ -27,9 +27,6 @@ export default async (
 
   // middleware
   const result = await resolver(parent, args, context, info);
-  console.log("MIDDLEWARE RUNNING");
-  console.log(Object.keys(context));
-  console.log(context.session);
   // afterware
 
   return result;

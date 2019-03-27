@@ -35,15 +35,10 @@ export const resolvers: ResolverMap = {
 
       // login successful
       // if (session) {
-      console.log("VIEW SESSION during login mutation");
-      console.log("user.id " + user.id);
       context.session.userId = user.id;
 
       if (context.req.session) {
         context.req.session.userId = user.id;
-
-        console.log(context.req.session.userId);
-        console.log(context.req.session);
       } else {
         throw Error("no session object!");
       }

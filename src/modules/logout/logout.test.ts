@@ -11,25 +11,18 @@ const password = "kasdjfksafdj";
 
 beforeAll(async () => {
   if (connection) {
-    console.log("CONNECTED ALREADY!");
-    const user = await User.create({
+    await User.create({
       email,
       password,
       confirmed: true
     }).save();
-
-    console.log("VIEW user");
-    console.log(user);
   } else {
     connection = await createTypeOrmConn();
-    const user = await User.create({
+    await User.create({
       email,
       password,
       confirmed: true
     }).save();
-
-    console.log("VIEW user");
-    console.log(user);
   }
 });
 
@@ -40,7 +33,16 @@ afterAll(async () => {
 });
 
 describe("logout", () => {
-  test("test LOGGING IN and then LOGGING OUT a user", async () => {
+  test("multiple sessions: test LOGGING IN and LOGGING OUT all clients", async () => {
+    const session1 = new TestClient(process.env.TEST_HOST as string);
+    const session2 = new TestClient(process.env.TEST_HOST as string);
+
+    await session1.login(email, password);
+    await session2.login(email, password);
+    expect(await session1.me()).toEqual(await session2.me());
+  });
+
+  test("single session: test LOGGING IN and then LOGGING OUT a user", async () => {
     const client = new TestClient(process.env.TEST_HOST as string);
 
     await client.login(email, password);
@@ -57,7 +59,6 @@ describe("logout", () => {
     await client.logout();
 
     const responseToo = await client.me();
-
     expect(responseToo.data.me).toBeNull();
   });
 });
