@@ -1,35 +1,39 @@
-import { Connection } from "typeorm";
+// import { getRepository } from "typeorm";
 
+import { Connection } from "typeorm";
 import { createTypeOrmConn } from "../../utils/createTypeormConnection";
 import { User } from "../../entity/User";
-import { TestClient } from "../../utils/testClient";
+import { TestClient } from "../../utils/TestClient";
+// import { clearDb } from "../../utils/deleteUsersAfterTestRun";
 
+// const connection = getConnection("default");
+// const userRepository = getConnection("default").getRepository(User);
+// const userRepository = getRepository(User);
 let connection: Connection;
-
-const email = "esad@mac.com";
+const email = "LOGOUT_TEST@mac.com";
 const password = "kasdjfksafdj";
 
-beforeAll(async () => {
-  if (connection) {
-    await User.create({
-      email,
-      password,
-      confirmed: true
-    }).save();
-  } else {
-    connection = await createTypeOrmConn();
-    await User.create({
-      email,
-      password,
-      confirmed: true
-    }).save();
-  }
+let user: any;
+let userId: string;
+
+beforeAll(async done => {
+  // if (!connection) {
+  connection = await createTypeOrmConn();
+  user = await User.create({
+    email,
+    password,
+    confirmed: true
+  }).save();
+  userId = user.id;
+  done();
+  // }
 });
 
-afterAll(async () => {
-  if (connection) {
-    connection.close();
-  }
+afterAll(async done => {
+  // clearDb(connection);
+  await User.remove(user);
+  connection.close();
+  done();
 });
 
 describe("logout", () => {
@@ -55,15 +59,16 @@ describe("logout", () => {
 
     const response1 = await client.me();
 
+    // we should be signed in
     expect(response1.data).toEqual({
       me: {
-        id: "cecec352-b002-4e62-bfb1-16acc5789592",
-        email: "esad@mac.com"
+        id: userId,
+        email
       }
     });
 
     await client.logout();
-
+    // sign out should be null (not sure why null, actually)
     const responseToo = await client.me();
     expect(responseToo.data.me).toBeNull();
 

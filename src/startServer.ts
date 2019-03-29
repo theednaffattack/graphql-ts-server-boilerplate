@@ -8,12 +8,12 @@ import * as connectRedis from "connect-redis";
 
 // connections
 import { redis } from "./redis";
-import { createTypeOrmConn } from "./utils/createTypeormConnection";
-
+// import { createConnection } from "typeorm";
 // imported functions
 import { confirmEmail } from "./routes/confirmEmail";
 import { genSchema } from "./utils/generateSchema";
 import { redisSessionPrefix } from "./constants";
+// import { createTypeOrmConn } from "./utils/createTypeormConnection";
 // import { RedisClient } from "redis";
 
 const RedisStore = connectRedis(session);
@@ -63,8 +63,9 @@ export const startServer = async () => {
 
   server.express.get("/confirm/:id", confirmEmail);
 
-  await createTypeOrmConn();
-
+  // createConnection()
+  // await createTypeOrmConn();
+  // .then(async () => {
   const app = await server.start({
     port: process.env.NODE_ENV === "test" ? 0 : 4000,
     cors
@@ -75,6 +76,10 @@ export const startServer = async () => {
   ${chalk.green("localhost")}: http://localhost:${chalk.green(port.toString())}
   ${chalk.green("LAN")}: http://${host}:${chalk.green(port.toString())}
   `);
-
   return app;
+  // }
+  // )
+  // .catch((error: string) =>
+  //   console.error("typeORM connection error\n" + error)
+  // );
 };

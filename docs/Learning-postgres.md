@@ -1,3 +1,7 @@
+## postgres tutorial
+
+http://www.postgresqltutorial.com/
+
 ## psql commands
 
 \du show all users

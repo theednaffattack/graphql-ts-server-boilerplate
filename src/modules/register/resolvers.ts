@@ -6,9 +6,9 @@ import { formatYupError } from "../../utils/formatYupError";
 import {
   duplicateEmail,
   emailInvalid,
-  emailNotLongEnough,
-  passwordNotLongEnough
+  emailNotLongEnough
 } from "./errorMessages";
+import { registerPasswordValidation } from "../../yupSchemas";
 // import { createConfirmedEmailLink } from "../../utils/createConfirmedEmailLink";
 // import { sendEmail } from "../../sendEmail";
 
@@ -18,10 +18,7 @@ const schema = yup.object().shape({
     .min(4, emailNotLongEnough)
     .max(255)
     .email(emailInvalid),
-  password: yup
-    .string()
-    .min(9, passwordNotLongEnough)
-    .max(255)
+  password: registerPasswordValidation
 });
 
 export const resolvers: ResolverMap = {

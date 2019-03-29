@@ -16,6 +16,7 @@ export const resolvers: ResolverMap = {
         );
 
         const promises = [];
+
         // tslint:disable-next-line:prefer-for-of
         for (let i = 0; i < sessionIds.length; i += 1) {
           promises.push(redis.del(`${redisSessionPrefix}${sessionIds[i]}`));
@@ -25,6 +26,7 @@ export const resolvers: ResolverMap = {
 
         return true;
       }
+      console.log("NO USER FOUND DURING LOGOUT!!!");
       return false;
     }
   }

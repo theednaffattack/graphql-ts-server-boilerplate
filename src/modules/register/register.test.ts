@@ -1,54 +1,56 @@
-import { request } from "graphql-request";
-import { User } from "../../entity/User";
+// import { createConnection } from "typeorm";
 
-// import { startServer } from "../../startServer";
-// import { AddressInfo } from "net";
+import { User } from "../../entity/User";
 import {
   emailNotLongEnough,
   duplicateEmail,
   emailInvalid,
   passwordNotLongEnough
 } from "./errorMessages";
+// import {
+//   // deleteUsersAfterTestsRun,
+//   clearDb
+// } from "../../utils/deleteUsersAfterTestRun";
+import { TestClient } from "../../utils/TestClient";
 import { createTypeOrmConn } from "../../utils/createTypeormConnection";
+import { Connection } from "typeorm";
+
+// needed for test setup
+let user: any;
+let connection: Connection;
+
+const email = "REGISTER_TEST@bill.com";
+const password = "whoopiebl";
+
+// jest commands - START
 
 beforeAll(async () => {
-  await createTypeOrmConn();
+  connection = await createTypeOrmConn();
 });
 
-const email = "eunice@bill.com";
-// const email = "eu";
-const password = "whoopiebl";
-// const password = "wh";
-
-export const registerMutation = (e: string, p: string) => `
-mutation {
-  register(email: "${e}", password: "${p}"){
-    path,
-    message
+afterAll(async () => {
+  if (connection) {
+    connection.close();
   }
-}
-`;
+});
 
-interface Response {
-  register: [
-    {
-      path: string;
-      message: string;
-    }
-  ];
-}
+// jest commands - END
 
+// tests
 describe("User registration testing", () => {
   it("Register user with properly formatted information", async done => {
-    const response: Response = await request(
-      process.env.TEST_HOST as string,
-      registerMutation(email, password)
-    );
+    const client = new TestClient(process.env.TEST_HOST as string);
 
-    expect(response).toEqual({ register: null });
+    const response = await client.register(email, password);
+
+    expect(response.data).toEqual({ register: null });
 
     const users = await User.find({ where: { email } });
-    const user = users[0];
+
+    expect(users).toHaveLength(1);
+
+    user = users[0];
+
     expect(user.email).toEqual(email);
     expect(user.password).not.toEqual(password);
 
@@ -56,13 +58,10 @@ describe("User registration testing", () => {
   });
 
   it("Test for duplicate emails", async done => {
-    const response2: Response = await request(
-      process.env.TEST_HOST as string,
-      registerMutation(email, password)
-    );
-
-    expect(response2.register).toHaveLength(1);
-    expect(response2.register[0]).toEqual({
+    const client = new TestClient(process.env.TEST_HOST as string);
+    const response2 = await client.register(email, password);
+    expect(response2.data.register).toHaveLength(1);
+    expect(response2.data.register[0]).toEqual({
       path: "email",
       message: duplicateEmail
     });
@@ -71,12 +70,10 @@ describe("User registration testing", () => {
   });
 
   it("Test for emails that are too short", async done => {
-    const response3: Response = await request(
-      process.env.TEST_HOST as string,
-      registerMutation("b", password)
-    );
+    const client = new TestClient(process.env.TEST_HOST as string);
+    const response3 = await client.register("b", password);
 
-    expect(response3).toEqual({
+    expect(response3.data).toEqual({
       register: [
         {
           path: "email",
@@ -93,11 +90,10 @@ describe("User registration testing", () => {
   });
 
   it("Test for passwords that are too short", async done => {
-    const response4: Response = await request(
-      process.env.TEST_HOST as string,
-      registerMutation(email, "fake")
-    );
-    expect(response4.register[0]).toEqual({
+    const client = new TestClient(process.env.TEST_HOST as string);
+    const response4 = await client.register(email, "bx");
+
+    expect(response4.data.register[0]).toEqual({
       path: "password",
       message: passwordNotLongEnough
     });
@@ -106,11 +102,10 @@ describe("User registration testing", () => {
   });
 
   it("Catch bad password and bad email (too short and mal formatted)", async done => {
-    const response5: Response = await request(
-      process.env.TEST_HOST as string,
-      registerMutation("bu", "fake")
-    );
-    expect(response5).toEqual({
+    const client = new TestClient(process.env.TEST_HOST as string);
+    const response5 = await client.register("jd", "yt");
+
+    expect(response5.data).toEqual({
       register: [
         {
           path: "email",

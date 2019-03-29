@@ -1,12 +1,10 @@
 export const invalidLogin = "invalid login";
 
-export const confirmEmailErrorText = "please confirm your email";
-
 export const confirmEmailError = [
-  { path: "email", message: confirmEmailErrorText }
+  { path: "email", message: "please confirm your email" }
 ];
 
-export const invalidError = [
+export const errorResponse = [
   {
     path: "email",
     message: invalidLogin
@@ -22,11 +20,8 @@ export const sessionError = (loginName: any) => {
   ];
 };
 
-export const forgotPasswordLockedError = "account is locked";
+export const passwordIsTooShort = "password is too short";
 
-export const forgotPasswordLockedErrorArr = [
-  {
-    path: "email",
-    message: "account is locked"
-  }
-];
+export const expiredKeyError = "key has expired";
+
+export const userNotFound = "could not find user with that email";

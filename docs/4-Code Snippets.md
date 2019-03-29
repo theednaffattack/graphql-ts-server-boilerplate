@@ -11,14 +11,14 @@ ima→ import { originalName as aliasName} from 'module'
 exp→ export default moduleName
 exd→ export { destructuredModule } from 'module'
 exa→ export { originalName as aliasName} from 'module'
-enf→ export const functionName = (params) => { }
+**enf→ export const functionName = (params) => { }**
 edf→ export default (params) => { }
 met→ methodName = (params) => { }
 fre→ arrayName.forEach(element => { }
 fof→ for(let itemName of objectName { }
 fin→ for(let itemName in objectName { }
 anfn→ (params) => { }
-nfn→ const functionName = (params) => { }
+**nfn→ const functionName = (params) => { }**
 dob→ const {propName} = objectToDescruct
 dar→ const [propName] = arrayToDescruct
 sti→ setInterval(() => { }, intervalTime
@@ -70,7 +70,7 @@ rnstyle→	const styles = StyleSheet.create({})
 Redux
 Prefix	Method
 rxaction→	redux action template
-rxconst→	export const $1 = '\$1'
+rxconst→	export const ​$1 = '\$1'
 rxreducer→ redux reducer template
 rxselect→ redux selector template
 PropTypes
