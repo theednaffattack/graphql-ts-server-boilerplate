@@ -5,7 +5,7 @@ import { ResolverMap } from "../../types/graphql-utils";
 import { forgotPasswordLockAccount } from "../../utils/forgotPasswordLockAccount";
 import { createForgotPasswordLink } from "../../utils/createForgotPasswordLink";
 import { User } from "../../entity/User";
-import { userNotFound, expiredKeyError } from "./errorMessages";
+import { expiredKeyError, userNotFoundError } from "./errorMessages";
 import { forgotPasswordPrefix } from "../../constants";
 import { registerPasswordValidation } from "../../yupSchemas";
 import { formatYupError } from "../../utils/formatYupError";
@@ -29,7 +29,7 @@ export const resolvers: ResolverMap = {
         return [
           {
             path: "email",
-            message: userNotFound
+            message: userNotFoundError
           }
         ];
       }
@@ -43,12 +43,17 @@ export const resolvers: ResolverMap = {
       console.log(email);
       return true;
     },
+
     forgotPasswordChange: async (
       _,
       { newPassword, key }: GQL.IForgotPasswordChangeOnMutationArguments,
       { redis }
     ) => {
-      const userId = await redis.get(`${forgotPasswordPrefix}${key}`);
+      const redisKey = `${forgotPasswordPrefix}${key}`;
+      const userId = await redis.get(redisKey);
+      console.log("FORGOTPASSWORD*CHANGE* RESOLVER");
+      console.log(`key: ${key}`);
+      console.log(`forgotPasswordPrefix: ${forgotPasswordPrefix}`);
       if (!userId) {
         return [
           {
@@ -66,14 +71,22 @@ export const resolvers: ResolverMap = {
 
       const hashedPassword = await bcrypt.hash(newPassword, 10);
 
-      console.log(newPassword, key);
-      await User.update(
+      console.log("FORGOTPASSWORD*CHANGE* RESOLVER -- newPassword");
+
+      console.log(newPassword);
+      console.log(key);
+
+      const updatePromise = await User.update(
         { id: userId as string },
         {
           forgotPasswordLocked: false,
           password: hashedPassword
         }
       );
+
+      const deleteKeyPromise = await redis.del(redisKey);
+
+      await Promise.all([updatePromise, deleteKeyPromise]);
 
       return false;
     }

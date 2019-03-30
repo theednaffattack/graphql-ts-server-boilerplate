@@ -24,4 +24,4 @@ export const passwordIsTooShort = "password is too short";
 
 export const expiredKeyError = "key has expired";
 
-export const userNotFound = "could not find user with that email";
+export const userNotFoundError = "could not find user with that email";

@@ -8,10 +8,10 @@ import * as Redis from "ioredis";
 import { forgotPasswordLockAccount } from "../../utils/forgotPasswordLockAccount";
 import { passwordIsTooShort, expiredKeyError } from "./errorMessages";
 import { forgotPasswordLockedError } from "../login/errorMessages";
-import {
-  // deleteUsersAfterTestsRun,
-  clearDb
-} from "../../utils/deleteUsersAfterTestRun";
+// import {
+//   // deleteUsersAfterTestsRun,
+//   clearDb
+// } from "../../utils/deleteUsersAfterTestRun";
 
 let connection: Connection;
 
@@ -37,8 +37,8 @@ beforeAll(async done => {
 
 afterAll(async done => {
   // get rid of any users created
-
-  await clearDb(connection);
+  await User.remove(user);
+  // await clearDb(connection);
   connection.close();
   done();
 });
@@ -46,12 +46,14 @@ afterAll(async done => {
 describe("forgot password", () => {
   test("make sure it works", async done => {
     const client = new TestClient(process.env.TEST_HOST as string);
-    const checkLock = await forgotPasswordLockAccount(userId, redis);
-    const url = await createForgotPasswordLink("", userId, redis);
-    const parts = url.split("/");
 
-    console.log("checkLock");
-    console.log(checkLock);
+    // lock account
+    await forgotPasswordLockAccount(userId, redis);
+    const url = await createForgotPasswordLink("", userId, redis);
+
+    // get the key from the forgot password link
+    const parts = url.split("/");
+    const key = parts[parts.length - 1];
 
     // make sure you can't login to a locked account
     expect(await client.login(email, password)).toEqual({
@@ -60,9 +62,8 @@ describe("forgot password", () => {
       }
     });
 
-    const key = parts[parts.length - 1];
-    const response = await client.forgotPasswordChange(newPassword, key);
-
+    // we'll have to unlock the account to move forward
+    // we'll have to change the password to unlock it, first let's...
     // try changing to a password that is too short
     expect(await client.forgotPasswordChange("a", key)).toEqual({
       data: {
@@ -73,7 +74,8 @@ describe("forgot password", () => {
       }
     });
 
-    // ???
+    // change the password
+    const response = await client.forgotPasswordChange(newPassword, key);
     expect(response.data).toEqual({
       forgotPasswordChange: null
     });
