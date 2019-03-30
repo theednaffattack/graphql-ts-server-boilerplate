@@ -5,6 +5,8 @@ import * as session from "express-session";
 import internalIp from "internal-ip";
 import chalk from "chalk";
 import * as connectRedis from "connect-redis";
+import * as rateLimit from "express-rate-limit";
+import * as RateLimitRedisStore from "rate-limit-redis";
 
 // connections
 import { redis } from "./redis";
@@ -51,6 +53,16 @@ export const startServer = async () => {
         secure: process.env.NODE_ENV === "production",
         maxAge: 1000 * 60 * 60 * 24 * 7 // 7 days
       }
+    })
+  );
+
+  server.express.use(
+    new rateLimit({
+      store: new RateLimitRedisStore({
+        client: redis
+      }),
+      windowMs: 15 * 60 * 1000, // 15 minutes
+      max: 100 // limit each IP to 100 requests per windowMs
     })
   );
 
