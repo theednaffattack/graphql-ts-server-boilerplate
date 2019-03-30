@@ -1,20 +1,17 @@
 import * as bcrypt from "bcryptjs";
 
-import { ResolverMap } from "../../types/graphql-utils";
-import { User } from "../../entity/User";
+import { ResolverMap } from "../../../types/graphql-utils";
+import { User } from "../../../entity/User";
 import {
   invalidError,
   confirmEmailError,
   forgotPasswordLockedError
   // sessionError
 } from "./errorMessages";
-import { userSessionIdPrefix } from "../../constants";
+import { userSessionIdPrefix } from "../../../constants";
 // import { redisSessionPrefix } from "../../constants";
 
 export const resolvers: ResolverMap = {
-  Query: {
-    dummy2: (_, {}) => "just a string"
-  },
   Mutation: {
     login: async function loginMut(
       _,

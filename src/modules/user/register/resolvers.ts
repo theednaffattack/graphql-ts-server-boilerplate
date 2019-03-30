@@ -1,14 +1,14 @@
 import * as yup from "yup";
 
-import { ResolverMap } from "../../types/graphql-utils";
-import { User } from "../../entity/User";
-import { formatYupError } from "../../utils/formatYupError";
+import { ResolverMap } from "../../../types/graphql-utils";
+import { User } from "../../../entity/User";
+import { formatYupError } from "../../../utils/formatYupError";
 import {
   duplicateEmail,
   emailInvalid,
   emailNotLongEnough
 } from "./errorMessages";
-import { registerPasswordValidation } from "../../yupSchemas";
+import { registerPasswordValidation } from "../../../yupSchemas";
 // import { createConfirmedEmailLink } from "../../utils/createConfirmedEmailLink";
 // import { sendEmail } from "../../sendEmail";
 
@@ -22,9 +22,6 @@ const schema = yup.object().shape({
 });
 
 export const resolvers: ResolverMap = {
-  Query: {
-    dummy: (_, {}) => "just a string"
-  },
   Mutation: {
     register: async (
       _,

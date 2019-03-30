@@ -1,10 +1,7 @@
-import { ResolverMap } from "../../types/graphql-utils";
-import { userSessionIdPrefix, redisSessionPrefix } from "../../constants";
+import { ResolverMap } from "../../../types/graphql-utils";
+import { userSessionIdPrefix, redisSessionPrefix } from "../../../constants";
 
 export const resolvers: ResolverMap = {
-  Query: {
-    dummy3: () => "dummy"
-  },
   Mutation: {
     logout: async (_, __, { redis, session }) => {
       const { userId } = session;
