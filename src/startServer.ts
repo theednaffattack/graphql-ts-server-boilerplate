@@ -7,6 +7,8 @@ import chalk from "chalk";
 import * as connectRedis from "connect-redis";
 import * as rateLimit from "express-rate-limit";
 import * as RateLimitRedisStore from "rate-limit-redis";
+import * as passport from "passport";
+import { Strategy } from "passport-twitter";
 
 // connections
 import { redis } from "./redis";
@@ -15,7 +17,8 @@ import { redis } from "./redis";
 import { confirmEmail } from "./routes/confirmEmail";
 import { genSchema } from "./utils/generateSchema";
 import { redisSessionPrefix } from "./constants";
-// import { createTypeOrmConn } from "./utils/createTypeormConnection";
+import { User } from "./entity/User";
+import { createTypeOrmConn } from "./utils/createTypeormConnection";
 // import { RedisClient } from "redis";
 
 const RedisStore = connectRedis(session);
@@ -75,13 +78,79 @@ export const startServer = async () => {
 
   server.express.get("/confirm/:id", confirmEmail);
 
-  // createConnection()
-  // await createTypeOrmConn();
-  // .then(async () => {
+  const connection = await createTypeOrmConn();
+
+  passport.use(
+    new Strategy(
+      {
+        consumerKey: process.env.TWITTER_CONSUMER_KEY as string,
+        consumerSecret: process.env.TWITTER_CONSUMER_SECRET as string,
+        callbackURL: "http://localhost:4000/auth/twitter/callback",
+        includeEmail: true
+      },
+      async function(_, __, profile, cb) {
+        const { id, emails } = profile;
+
+        const query = connection
+          .getRepository(User)
+          .createQueryBuilder("user")
+          .where("user.twitterId = :id", { id });
+
+        let email: string | null = null;
+
+        if (emails) {
+          email = emails[0].value;
+
+          query.orWhere("user.email = :email", { email });
+        }
+
+        let user = await query.getOne();
+
+        // this user needs to be registered
+        if (!user) {
+          user = await User.create({
+            twitterId: id,
+            email
+          }).save();
+        } else if (!user.twitterId) {
+          // merge account
+          // we found user by email
+          user.twitterId = id;
+          await user.save();
+        } else {
+          // we have a twitterId
+          // login
+        }
+
+        // console.log(cb("hello"));
+        // User.findOrCreate({ twitterId: profile.id }, function(err, user) {
+        //   return cb(err, user);
+        // });
+        return cb(null, { id: user.id });
+      }
+    )
+  );
+
   const app = await server.start({
     port: process.env.NODE_ENV === "test" ? 0 : 4000,
     cors
   });
+
+  server.express.use(passport.initialize());
+
+  server.express.get("/auth/twitter", passport.authenticate("twitter"));
+
+  server.express.get(
+    "/auth/twitter/callback",
+    passport.authenticate("twitter", { session: false }), //  failureRedirect: "/login" ,
+    (req, res) => {
+      // Successful authentication, redirect home.
+      console.log(Object.keys(req));
+      (req.session as any).userId = (req.user as any).id;
+      // @todo: redirect to frontend
+      res.redirect("/");
+    }
+  );
 
   console.log(`
   Graphql server is running!
@@ -89,9 +158,4 @@ export const startServer = async () => {
   ${chalk.green("LAN")}: http://${host}:${chalk.green(port.toString())}
   `);
   return app;
-  // }
-  // )
-  // .catch((error: string) =>
-  //   console.error("typeORM connection error\n" + error)
-  // );
 };

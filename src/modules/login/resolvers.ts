@@ -37,7 +37,7 @@ export const resolvers: ResolverMap = {
         return [{ path: "email", message: forgotPasswordLockedError }];
       }
       // compare the supplied password to the db password for this user
-      const valid = await bcrypt.compare(password, user.password);
+      const valid = await bcrypt.compare(password, user.password as string);
 
       // password is incorrect (does not match db record)
       if (valid === false) {
