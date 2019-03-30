@@ -1,15 +1,15 @@
 // import { getRepository } from "typeorm";
 
-import { Connection } from "typeorm";
-import { createTypeOrmConn } from "../../utils/createTypeormConnection";
+// import { Connection } from "typeorm";
 import { User } from "../../entity/User";
 import { TestClient } from "../../utils/TestClient";
+import { createTestConn } from "../../utils/createTestConnection";
 // import { clearDb } from "../../utils/deleteUsersAfterTestRun";
 
 // const connection = getConnection("default");
 // const userRepository = getConnection("default").getRepository(User);
 // const userRepository = getRepository(User);
-let connection: Connection;
+let connection: any = null;
 const email = "LOGOUT_TEST@mac.com";
 const password = "kasdjfksafdj";
 
@@ -18,7 +18,7 @@ let userId: string;
 
 beforeAll(async done => {
   // if (!connection) {
-  connection = await createTypeOrmConn();
+  connection = await createTestConn();
   user = await User.create({
     email,
     password,
@@ -29,12 +29,13 @@ beforeAll(async done => {
   // }
 });
 
-afterAll(async done => {
-  // clearDb(connection);
-  await User.remove(user);
-  connection.close();
-  done();
-});
+console.log(connection ? "connection established" : " no connection");
+// afterAll(async done => {
+//   // clearDb(connection);
+//   await User.remove(user);
+//   connection.close();
+//   done();
+// });
 
 describe("logout", () => {
   test("multiple sessions: test LOGGING IN and LOGGING OUT all clients", async done => {

@@ -1,9 +1,10 @@
-import { createConfirmedEmailLink } from "./createConfirmedEmailLink";
-import { createTypeOrmConn } from "./createTypeormConnection";
-import { User } from "../entity/User";
 import * as Redis from "ioredis";
 import { Connection } from "typeorm";
 import fetch from "node-fetch";
+
+import { createConfirmedEmailLink } from "./createConfirmedEmailLink";
+import { User } from "../../entity/User";
+import { createTypeOrmConn } from "../../utils/createTypeormConnection";
 
 const redis = new Redis();
 

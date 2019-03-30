@@ -1,40 +1,30 @@
-import { clearDb } from "../../utils/deleteUsersAfterTestRun";
-import { createTypeOrmConn } from "../../utils/createTypeormConnection";
 import { User } from "../../entity/User";
 
-import { Connection } from "typeorm";
 import { TestClient } from "../../utils/TestClient";
+import { createTestConn } from "../../utils/createTestConnection";
 // import { userSessionIdPrefix } from "../../constants";
 
-let connection: Connection;
+let connection: any = null;
 const email = "ME_TESTING@mac.com";
 const password = "ME_PASSWORD";
 
 let user: any;
 
 beforeAll(async () => {
-  if (connection) {
-    user = await User.create({
-      email,
-      password,
-      confirmed: true
-    }).save();
-  } else {
-    connection = await createTypeOrmConn();
-    user = await User.create({
-      email,
-      password,
-      confirmed: true
-    }).save();
-  }
+  connection = await createTestConn();
+  user = await User.create({
+    email,
+    password,
+    confirmed: true
+  }).save();
 });
 
-afterAll(async () => {
-  if (connection) {
-    clearDb(connection);
-    connection.close();
-  }
-});
+console.log(connection ? "connection established" : " no connection");
+// afterAll(async () => {
+//   if (connection) {
+//     connection.close();
+//   }
+// });
 
 describe("me", () => {
   test("return null if no cookie", async () => {

@@ -1,19 +1,17 @@
-import { Connection } from "typeorm";
-
 import { User } from "../../entity/User";
-import { createTypeOrmConn } from "../../utils/createTypeormConnection";
 import { TestClient } from "../../utils/TestClient";
 import { createForgotPasswordLink } from "../../utils/createForgotPasswordLink";
 import * as Redis from "ioredis";
 import { forgotPasswordLockAccount } from "../../utils/forgotPasswordLockAccount";
 import { passwordIsTooShort, expiredKeyError } from "./errorMessages";
 import { forgotPasswordLockedError } from "../login/errorMessages";
+import { createTestConn } from "../../utils/createTestConnection";
 // import {
 //   // deleteUsersAfterTestsRun,
 //   clearDb
 // } from "../../utils/deleteUsersAfterTestRun";
 
-let connection: Connection;
+let connection: any;
 
 let userId: string;
 let user: any;
@@ -25,7 +23,7 @@ const password = "kasdjfksafdj";
 const newPassword = "ddksfjdaouiew";
 
 beforeAll(async done => {
-  connection = await createTypeOrmConn();
+  connection = await createTestConn();
   user = await User.create({
     email,
     password,
@@ -35,13 +33,7 @@ beforeAll(async done => {
   done();
 });
 
-afterAll(async done => {
-  // get rid of any users created
-  await User.remove(user);
-  // await clearDb(connection);
-  connection.close();
-  done();
-});
+console.log(connection);
 
 describe("forgot password", () => {
   test("make sure it works", async done => {

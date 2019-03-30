@@ -19,6 +19,7 @@ import { genSchema } from "./utils/generateSchema";
 import { redisSessionPrefix } from "./constants";
 import { User } from "./entity/User";
 import { createTypeOrmConn } from "./utils/createTypeormConnection";
+import { createTestConn } from "./utils/createTestConnection";
 // import { RedisClient } from "redis";
 
 const RedisStore = connectRedis(session);
@@ -31,6 +32,10 @@ export const host = internalIp.v4.sync();
 const SECRET: string = process.env.SESSION_SECRET || "no ENV value given";
 
 export const startServer = async () => {
+  if (process.env.NODE_ENV === "test") {
+    await redis.flushall();
+  }
+
   const server = new GraphQLServer({
     schema: genSchema(),
     context: ({ request }) => ({
@@ -78,7 +83,13 @@ export const startServer = async () => {
 
   server.express.get("/confirm/:id", confirmEmail);
 
-  const connection = await createTypeOrmConn();
+  let connection: any;
+
+  if (process.env.NODE_ENV === "test") {
+    await createTestConn(true);
+  } else {
+    connection = await createTypeOrmConn();
+  }
 
   passport.use(
     new Strategy(

@@ -3,20 +3,13 @@ import { Connection } from "typeorm";
 import { invalidLogin, confirmEmailErrorText } from "./errorMessages";
 import { TestClient } from "../../utils/testClient";
 import { User } from "../../entity/User";
-import { clearDb } from "../../utils/deleteUsersAfterTestRun";
-import { createTypeOrmConn } from "../../utils/createTypeormConnection";
+import { createTestConn } from "../../utils/createTestConnection";
 
 let connection: Connection;
 
 beforeAll(async () => {
   if (!connection) {
-    connection = await createTypeOrmConn();
-  }
-});
-
-afterAll(async () => {
-  if (connection) {
-    clearDb(connection);
+    connection = await createTestConn();
   }
 });
 

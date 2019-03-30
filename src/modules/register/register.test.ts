@@ -1,5 +1,8 @@
 // import { createConnection } from "typeorm";
 
+import { Connection } from "typeorm";
+import * as faker from "faker";
+
 import { User } from "../../entity/User";
 import {
   emailNotLongEnough,
@@ -7,25 +10,20 @@ import {
   emailInvalid,
   passwordNotLongEnough
 } from "./errorMessages";
-// import {
-//   // deleteUsersAfterTestsRun,
-//   clearDb
-// } from "../../utils/deleteUsersAfterTestRun";
 import { TestClient } from "../../utils/TestClient";
-import { createTypeOrmConn } from "../../utils/createTypeormConnection";
-import { Connection } from "typeorm";
+import { createTestConn } from "../../utils/createTestConnection";
 
 // needed for test setup
 let user: any;
 let connection: Connection;
 
-const email = "REGISTER_TEST@bill.com";
-const password = "whoopiebl";
+const email = faker.internet.email();
+const password = faker.internet.password();
 
 // jest commands - START
 
 beforeAll(async () => {
-  connection = await createTypeOrmConn();
+  connection = await createTestConn();
 });
 
 afterAll(async () => {
